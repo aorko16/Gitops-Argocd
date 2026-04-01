@@ -6,7 +6,7 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: canada-app
+  name: canada-app 
   namespace: backend-dev
 spec:
   replicas: 2
