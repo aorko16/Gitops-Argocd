@@ -1,12 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: backend-dev
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: canada-app
-  namespace: backend-dev        # Change to backend-prod when needed
-  labels:
-    app: canada
+  namespace: backend-dev
 spec:
-  replicas: 2                   # Number of pods
+  replicas: 2
   selector:
     matchLabels:
       app: canada
@@ -16,15 +19,23 @@ spec:
         app: canada
     spec:
       containers:
-      - name: canada
-        image: aorko16/canada:latest     # Your Docker Hub image
-        ports:
-        - containerPort: 80              # Nginx default port
-        resources:
-          requests:
-            cpu: "100m"
-            memory: "128Mi"
-          limits:
-            cpu: "500m"
-            memory: "256Mi"
-        imagePullPolicy: Always
+        - name: canada
+          image: aorko16/canada:latest
+          ports:
+            - containerPort: 80
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: canada-service
+  namespace: backend-dev
+spec:
+  selector:
+    app: canada
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP      # Change to LoadBalancer if you want external access
+
+
