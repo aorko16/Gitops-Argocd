@@ -9,6 +9,9 @@ spec:
   destinations:
     - namespace: backend-dev
       server: https://kubernetes.default.svc
+  clusterResourceWhitelist:          # ✅ Added — needed for Namespace kind
+    - group: ""
+      kind: Namespace
   namespaceResourceWhitelist:
     - group: apps
       kind: Deployment
@@ -16,6 +19,7 @@ spec:
       kind: Service
 
 ---
+
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -26,18 +30,16 @@ spec:
   source:
     repoURL: https://github.com/aorko16/Gitops-Argocd.git
     targetRevision: main
-    path: k8s
-    
+    path: canada
   destination:
     server: https://kubernetes.default.svc
     namespace: backend-dev
-
   syncPolicy:
     automated:
-      prune: true                # Remove resources deleted from Git
-      selfHeal: true             # Revert manual cluster changes
+      prune: true
+      selfHeal: true
     syncOptions:
-      - CreateNamespace=true     # Auto-create namespace if missing
+      - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
     retry:
@@ -46,4 +48,3 @@ spec:
         duration: 5s
         factor: 2
         maxDuration: 3m
-
