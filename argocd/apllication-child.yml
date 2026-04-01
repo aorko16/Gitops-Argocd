@@ -6,7 +6,7 @@ metadata:
 spec:
   project: backend-team
   source:
-    repoURL: 
+    repoURL: https://github.com/aorko16/Gitops-Argocd.git
     targetRevision: main
     path: canada   # folder name in git
   destination:
