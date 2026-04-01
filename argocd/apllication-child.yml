@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: canada-app
+  namespace: argocd
+spec:
+  project: backend-team
+  source:
+    repoURL: 
+    targetRevision: main
+    path: canada   # folder name in git
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: backend-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
