@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: canada
-          image: aorko16/canada:latest
+          image: aorko16/bangla:latest
           ports:
             - containerPort: 80
           imagePullPolicy: Always
