@@ -17,6 +17,10 @@ spec:
       kind: Deployment
     - group: ""
       kind: Service
+    - group: ""
+      kind: Pod              # ✅ Added
+    - group: "apps"
+      kind: ReplicaSet       # ✅ Added — shows between Deployment and Pod
 
 ---
 
@@ -30,7 +34,7 @@ spec:
   source:
     repoURL: https://github.com/aorko16/Gitops-Argocd.git
     targetRevision: main
-    path: k8s              # ✅ Changed from 'canada' → 'k8s'
+    path: k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: backend-dev
