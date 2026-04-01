@@ -1,0 +1,105 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: frontend-team
+  namespace: argocd
+spec:
+  description: Project for frontend team apps
+  sourceRepos:
+    - https://github.com/your-username/argocd-demos.git
+    - https://github.com/aorko16/Gitops-Argocd.git        # ✅ Added missing repo
+  destinations:
+    - namespace: frontend
+      server: https://kubernetes.default.svc
+    - namespace: backend-dev                                # ✅ Added missing namespace
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: apps
+      kind: Deployment
+    - group: ""
+      kind: Service
+    - group: ""
+      kind: ConfigMap
+    - group: ""
+      kind: Secret
+  roles:
+    - name: frontend-admins
+      description: Admins for frontend team
+      policies:
+        - p, proj:frontend-team:frontend-admins, applications, *, frontend-team/*, allow
+      groups:
+        - frontend-admins-github-team
+
+---                                                         # ✅ Added missing separator
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: canada-app
+  namespace: argocd
+spec:
+  project: frontend-team                                    # ✅ Fixed: was backend-team
+  source:
+    repoURL: https://github.com/aorko16/Gitops-Argocd.git
+    targetRevision: main
+    path: canada
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: backend-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canada-app
+  namespace: backend-dev
+  labels:
+    app: canada
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: canada
+  template:
+    metadata:
+      labels:
+        app: canada
+    spec:
+      containers:
+      - name: canada
+        image: aorko16/canada:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+        imagePullPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: canada-service
+  namespace: backend-dev
+  labels:
+    app: canada
+spec:
+  selector:
+    app: canada
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP        # Change to LoadBalancer if you want external access
